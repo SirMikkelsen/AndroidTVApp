@@ -21,4 +21,18 @@ import java.util.ArrayList;
 import java.util.List;;
 
 public class MainFragment extends BrowseFragment {
+
+    private  ArrayList <Video> mVideos = new ArrayList<Video>();
+
+    @Override
+
+    public  void onActivityCreated(Bundle savedInstanceState){
+
+        super.onActivityCreated(savedInstanceState);
+
+
+        //    loadData;
+        }
+
+
 }
