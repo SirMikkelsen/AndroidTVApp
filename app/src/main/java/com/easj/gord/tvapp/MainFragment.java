@@ -20,19 +20,80 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;;
 
-public class MainFragment extends BrowseFragment {
+public class MainFragment extends BrowseFragment implements OnItemViewClickedListener   {
 
-    private  ArrayList <Video> mVideos = new ArrayList<Video>();
+    private List<Video> mVideos = new ArrayList<Video>();
 
     @Override
-
-    public  void onActivityCreated(Bundle savedInstanceState){
-
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        loadData();
 
+        setTitle("Apress Media Player");
+        setHeadersState(HEADERS_HIDDEN);
+        setHeadersTransitionOnBackEnabled(true);
 
-        //    loadData;
+        loadRows();
+
+        setOnItemViewClickedListener( this );
+    }
+
+    private void loadData() {
+        String json = Utils.loadJSONFromResource( getActivity(), R.raw.videos );
+        Type collection = new TypeToken<ArrayList<Video>>(){}.getType();
+
+        Gson gson = new Gson();
+        mVideos = gson.fromJson( json, collection );
+    }
+
+    private void loadRows() {
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter( new ListRowPresenter() );
+        CardPresenter presenter = new CardPresenter();
+
+        List<String> categories = getCategories();
+
+        if( categories == null || categories.isEmpty() )
+            return;
+
+        for( String category : categories ) {
+            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter( presenter );
+            for( Video movie : mVideos ) {
+                if( category.equalsIgnoreCase( movie.getCategory() ) )
+                    listRowAdapter.add( movie );
+            }
+            if( listRowAdapter.size() > 0 ) {
+                HeaderItem header = new HeaderItem( adapter.size() - 1, category );
+                adapter.add( new ListRow( header, listRowAdapter ) );
+            }
         }
 
+        //setupPreferences(adapter);
+
+        setAdapter(adapter);
+    }
+
+    private List<String> getCategories() {
+        if( mVideos == null )
+            return null;
+
+        List<String> categories = new ArrayList<String>();
+        for( Video movie : mVideos ) {
+            if( !categories.contains( movie.getCategory() ) ) {
+                categories.add( movie.getCategory() );
+            }
+        }
+
+        return categories;
+    }
+
+    @Override
+    public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+        if (item instanceof Video) {
+            Video video = (Video) item;
+            Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+            intent.putExtra(VideoDetailsFragment.EXTRA_VIDEO, video);
+            startActivity(intent);
+        }
+    }
 
 }
