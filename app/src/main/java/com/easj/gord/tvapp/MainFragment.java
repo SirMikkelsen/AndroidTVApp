@@ -86,7 +86,7 @@ public class MainFragment extends BrowseFragment implements OnItemViewClickedLis
         return categories;
     }
 
-    @Override
+ /**/  @Override
     public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
         if (item instanceof Video) {
             Video video = (Video) item;
